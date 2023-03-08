@@ -232,14 +232,12 @@ class FactorizedSpectralConv(nn.Module):
                                                 **decomposition_kwargs)
             self.weight.normal_(0, scale)
         else:
-            self.weight = nn.ModuleList([
-                 FactorizedTensor.new(
-                    weight_shape,
+            self.weight = [FactorizedTensor.new(weight_shape,
                     rank=self.rank, factorization=factorization, 
                     fixed_rank_modes=fixed_rank_modes,
                     **decomposition_kwargs
                     ) for _ in range((2**(self.order-1))*n_layers)]
-                )
+                
             for w in self.weight:
                 w.normal_(0, scale)
 
