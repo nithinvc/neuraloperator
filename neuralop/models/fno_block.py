@@ -237,9 +237,9 @@ class FactorizedSpectralConv(nn.Module):
                     fixed_rank_modes=fixed_rank_modes,
                     **decomposition_kwargs
                     ) for _ in range((2**(self.order-1))*n_layers)]
-                
             for w in self.weight:
                 w.normal_(0, scale)
+
 
         self._contract = get_contract_fun(self.weight[0], implementation=implementation, separable=separable)
 
@@ -247,6 +247,22 @@ class FactorizedSpectralConv(nn.Module):
             self.bias = nn.Parameter(scale * torch.randn(*((n_layers, self.out_channels) + (1, )*self.order)))
         else:
             self.bias = None
+    
+    def cuda(self, device=None):
+        super().cuda(device=device)
+        if isinstance(self.weight, list):
+            for w in self.weight:
+                w.cuda()
+        else:
+          self.weight.cuda()
+
+    def cpu(self):
+        super().cpu()
+        if ininstance(self.weight, list):
+            for w in self.weight:
+                w.cpu()
+        else:
+          self.weight.cpu()
 
     def forward(self, x, indices=0):
         """Generic forward pass for the Factorized Spectral Conv
